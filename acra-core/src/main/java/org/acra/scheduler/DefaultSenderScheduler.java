@@ -39,10 +39,12 @@ import org.acra.util.IOUtils;
 public class DefaultSenderScheduler implements SenderScheduler {
     private final Context context;
     private final CoreConfiguration config;
+    private final boolean useLegacy;
 
     public DefaultSenderScheduler(@NonNull Context context, @NonNull CoreConfiguration config) {
         this.context = context;
         this.config = config;
+        this.useLegacy = Build.MANUFACTURER.equalsIgnoreCase("xiaomi");
     }
 
     @Override
@@ -52,7 +54,7 @@ public class DefaultSenderScheduler implements SenderScheduler {
             final Intent intent = new Intent();
             intent.putExtra(LegacySenderService.EXTRA_ONLY_SEND_SILENT_REPORTS, onlySendSilentReports);
             intent.putExtra(LegacySenderService.EXTRA_ACRA_CONFIG, config);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1 && !useLegacy) {
                 JobScheduler scheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
                 PersistableBundle extras = new PersistableBundle();
                 extras.putString(LegacySenderService.EXTRA_ACRA_CONFIG, IOUtils.serialize(config));
